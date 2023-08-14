@@ -4,3 +4,6 @@ class Constant:
     
     create_room_channel = 1124365275651907757
     voice_category = 1123502436288573550
+
+    rooms_chat = 1124375214701166754
+    voice_notification_role = 1140657813618704444

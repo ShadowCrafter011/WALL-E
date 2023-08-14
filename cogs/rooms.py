@@ -4,6 +4,7 @@ from print import print
 import asyncio
 import discord
 import json
+from discord.utils import get
 
 
 class RoomHandler(commands.Cog):
@@ -32,7 +33,7 @@ class RoomHandler(commands.Cog):
 
         # Handle room deletion
         if old_channel and len(old_channel.members) == 0 and str(old_channel.id) in room_ids():
-            asyncio.create_task(delete_channel(old_channel))
+            asyncio.create_task(self.delete_channel(old_channel))
 
         # Handle room creation
         if new_channel and new_channel.id == constant.create_room_channel:
@@ -55,19 +56,52 @@ class RoomHandler(commands.Cog):
             add_room(created_room.id, member.id)
             await member.move_to(created_room)
 
+            embed = discord.Embed(
+                color=0x0ac400
+            )
+            embed.set_author(
+                name=member.display_name,
+                icon_url=member.display_avatar
+            )
+            embed.add_field(
+                name="Room creation notification",
+                value=f"{member.mention} created {new_state.channel.mention}"
+            )
+            
+            rooms_channel = self.bot.get_channel(constant.rooms_chat)
+            await rooms_channel.send(f"<@&{constant.voice_notification_role}>", embed=embed)
+
+    async def delete_channel(self, channel, sleep=5):
+        await asyncio.sleep(sleep)
+        if len(channel.members) > 0:
+            return
+        await channel.delete()
+
+        owner_id = remove_room(channel.id)
+
+        channel_owner = await self.bot.fetch_user(owner_id)
+
+        embed = discord.Embed(
+            color=0xd6000b
+        )
+        embed.set_author(
+            name=channel_owner.display_name,
+            icon_url=channel_owner.display_avatar
+        )
+        embed.add_field(
+            name="Room deletion notification",
+            value=f"{channel_owner.mention}'s room was automatically removed"
+        )
+
+        rooms_channel = self.bot.get_channel(constant.rooms_chat)
+        await rooms_channel.send(embed=embed)
+
 
 async def setup(client):
     await client.add_cog(RoomHandler(client))
 
 
 # Util methods
-async def delete_channel(channel, sleep=5):
-    await asyncio.sleep(sleep)
-    if len(channel.members) > 0:
-        return
-    await channel.delete()
-    remove_room(channel.id)
-
 def room_ids():
     with open("data/rooms.json") as rooms:
         return json.loads(rooms.read())
@@ -78,8 +112,10 @@ def write_data(data):
 
 def remove_room(room_id):
     data = room_ids()
+    owner_id = data[str(room_id)]
     del data[str(room_id)]
     write_data(data)
+    return owner_id
 
 
 def add_room(room_id, member_id):
