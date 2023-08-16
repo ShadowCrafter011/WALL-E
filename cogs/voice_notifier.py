@@ -11,6 +11,9 @@ class VoiceNotifier(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, old_state, new_state):
+        if old_state.channel == new_state.channel:
+            return
+
         if not new_state.channel:
             return
 
