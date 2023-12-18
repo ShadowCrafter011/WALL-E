@@ -1,10 +1,11 @@
 from discord.ext import commands
 from constants import constant
+from discord.utils import get
 from print import print
 import asyncio
 import discord
 import json
-from discord.utils import get
+import os
 
 
 class RoomHandler(commands.Cog):
@@ -103,8 +104,11 @@ async def setup(client):
 
 # Util methods
 def room_ids():
-    with open("data/rooms.json") as rooms:
-        return json.loads(rooms.read())
+    if os.path.exists("data/rooms.json"):
+        with open("data/rooms.json") as rooms:
+            return json.loads(rooms.read())
+    else:
+        return {}
 
 def write_data(data):
     with open("data/rooms.json", "w") as rooms:

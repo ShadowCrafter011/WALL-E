@@ -1,9 +1,14 @@
 from discord.ext import tasks, commands
 from discord import app_commands, File
+from PIL import UnidentifiedImageError
 from constants import constant
 from random import randint
 from print import print
+from PIL import Image
+import requests
+import discord
 import pickle
+import uuid
 import os
 
 
@@ -48,6 +53,31 @@ class IconHandler(commands.Cog):
             pic = File(img)
             await interaction.response.send_message(file=pic)
 
-    
+    @app_commands.command(name="add-image", description="Add an image to the server icon cycle")
+    @app_commands.describe(image_url="URL of the image to be added")
+    async def add_image(self, interaction, image_url: str):
+        role_admin = find_role(constant.admin_role_id, interaction.guild)
+        role_imager = find_role(constant.imager_role_id, interaction.guild)
+        if role_admin in interaction.user.roles or role_imager in interaction.user.roles:
+            img_data = requests.get(image_url).content
+            file_name = f"{uuid.uuid4()}.jpg"
+            path = os.path.join("data/icons", file_name)
+            with open(path, "wb") as image:
+                image.write(img_data)
+            try:
+                with Image.open(path) as im:
+                    im.verify()
+            except UnidentifiedImageError:
+                os.remove(path)
+                return await interaction.response.send_message("Image URL seems to be invalid or not an image")
+
+            await interaction.response.send_message("Image downloaded and added to icon cycle")
+        else:
+            await interaction.response.send_message(f"Sorry, you're not allowed to use this command")
+
+
+def find_role(role_id, guild):
+    return discord.utils.find(lambda r: r.id == role_id, guild.roles)
+
 async def setup(client):
     await client.add_cog(IconHandler(client))

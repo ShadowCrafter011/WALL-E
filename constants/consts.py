@@ -7,3 +7,5 @@ class Constant:
 
     rooms_chat = 1124375214701166754
     voice_notification_role = 1140657813618704444
+
+    imager_role_id = 1186229175569371189
