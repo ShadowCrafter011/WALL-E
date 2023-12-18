@@ -9,8 +9,8 @@ class SpamHandler(commands.Cog):
     @app_commands.command(name="spam", description="Send a message multiple times")
     @app_commands.describe(message="Message to be sent", n="Number of times message gets sent capped to 10")
     async def spam(self, interaction, message:str, n: int):
-        await interaction.response.send_message(f"Sending \"{message}\" {n} times")
         n = min(n, 10)
+        await interaction.response.send_message(f"Sending \"{message}\" {n} times")
         for _ in range(n):
             await interaction.channel.send(message)
 
