@@ -20,6 +20,7 @@ async def main():
     intents = discord.Intents.default()
     intents.voice_states = True
     intents.message_content = True
+    intents.members = True
     client = commands.Bot(intents=intents, command_prefix="!")
 
     for file in os.listdir("cogs"):
