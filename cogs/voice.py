@@ -108,6 +108,14 @@ class VoiceHandler(commands.Cog):
 
     @app_commands.command(name="leave", description="Lass WALL-E den Sprachchat verlassen")
     async def leave(self, interaction):
+        if base_path := os.getenv("BASE_PATH"):
+            queue_path = os.path.join(base_path, "data/audio_queue.json")
+        else:
+            queue_path = "/home/lukas/WALL-E/data/audio_queue.json"
+
+        with open(queue_path, "w") as queue_file:
+            json.dump([], queue_file)
+
         await self.vc.disconnect()
         await interaction.response.send_message("WALL-E den Sprachchat verlassen")
 
