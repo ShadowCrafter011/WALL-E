@@ -9,3 +9,5 @@ class Constant:
     voice_notification_role = 1140657813618704444
 
     imager_role_id = 1186229175569371189
+
+    bot_channel = 880438704022388796

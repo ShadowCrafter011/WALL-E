@@ -3,9 +3,9 @@
 {
 	"name": "Ubuntu",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/base:jammy",
-	"features": {
-		"ghcr.io/devcontainers/features/python:1": {}
+	"build": {
+		"context": "..",
+		"dockerfile": "../development.Dockerfile"
 	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
@@ -15,7 +15,14 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "pip install -r requirements.txt"
+	"postCreateCommand": "pip install -r requirements.txt --root-user-action ignore && git config --global --add safe.directory /workspaces/WALL-E",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python"
+			]
+		}
+	}
 
 	// Configure tool-specific properties.
 	// "customizations": {},
