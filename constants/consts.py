@@ -11,3 +11,5 @@ class Constant:
     imager_role_id = 1186229175569371189
 
     bot_channel = 880438704022388796
+
+    geoguessr_role = 1346221365107232870
